@@ -129,12 +129,10 @@ findBtn.addEventListener('click', async () => {
   }
 
   // Load matching word list
-  const filename = `${cols}_letters_words.txt`;
-  let availableWords;
-  try {
-    availableWords = await loadWordsList(filename);
-  } catch (err) {
-    alert(`Missing dictionary file: ${filename}`);
+  const filename = `${cols}-letter-words.json`;
+  let availableWords = await loadWordsListJSON(filename);
+  if (!availableWords.length) {
+    alert(`Missing or empty dictionary file: ${filename}`);
     return;
   }
 

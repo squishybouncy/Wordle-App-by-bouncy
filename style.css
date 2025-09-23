@@ -1,3 +1,4 @@
+/* ===== GLOBAL ===== */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -5,40 +6,87 @@ body {
   text-align: center;
 }
 
-/* MENU */
-.menu { background: #333; padding: 8px; display: flex; }
-.menu-btn { background: #444; color: white; border: none; padding: 8px 12px; cursor: pointer; }
-.menu-btn:hover { background: #555; }
-.menu-dropdown { position: relative; }
+/* ===== MENU BAR ===== */
+.menu {
+  background: #333;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+}
+
+.menu-left {
+  display: flex;          /* horizontal layout */
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-btn {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.menu-btn:hover {
+  background: #555;
+}
+
+.menu-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown content hidden by default */
 .dropdown-content {
   display: none;
   position: absolute;
+  top: 100%;
+  left: 0;
   background: #333;
   min-width: 150px;
-  z-index: 1;
+  z-index: 10;
   flex-direction: column;
+  border: 1px solid #444;
 }
+
 .dropdown-content button {
   background: none;
   color: white;
   border: none;
-  padding: 8px;
+  padding: 8px 12px;
   text-align: left;
   cursor: pointer;
+  width: 100%;
 }
-.menu-dropdown:hover .dropdown-content { display: block; }
 
-/* PAGES */
-.page { display: none; padding: 20px; }
-.page.active { display: block; }
+.dropdown-content button:hover {
+  background: #555;
+}
 
-/* BOARD */
+/* Show dropdown on hover */
+.menu-dropdown:hover .dropdown-content {
+  display: flex;
+}
+
+/* ===== PAGES ===== */
+.page {
+  display: none;
+  padding: 20px;
+}
+.page.active {
+  display: block;
+}
+
+/* ===== BOARD / GRID ===== */
 .board {
   display: grid;
   gap: 5px;
   justify-content: center;
   margin: 20px auto;
 }
+
 .tile {
   width: 50px;
   height: 50px;
@@ -52,9 +100,21 @@ body {
   color: white;
   cursor: pointer;
   user-select: none;
+  text-transform: uppercase;
 }
+
 .yellow { background: #c9b458; }
 .green  { background: #6aaa64; }
 
-.grid-controls { margin: 15px 0; }
-.answer-box   { margin: 15px 0; }
+/* ===== CONTROLS ===== */
+.grid-controls {
+  margin: 15px 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.answer-box {
+  margin: 15px 0;
+}
