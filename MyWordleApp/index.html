@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wordle Tools</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ===== MENU ===== -->
+  <nav class="menu">
+    <div class="menu-left">
+      <button class="menu-btn" data-page="home">Home</button>
+      <div class="menu-dropdown">
+        <button class="menu-btn">Plays ▾</button>
+        <div class="dropdown-content">
+          <button data-page="wordle">Wordle</button>
+          <button data-page="temp">Temporary Page</button>
+        </div>
+      </div>
+      <div class="menu-dropdown">
+        <button class="menu-btn">Tools ▾</button>
+        <div class="dropdown-content">
+          <button data-page="guesser">Words Guesser</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== PAGES ===== -->
+  <div id="pages">
+    <div id="home" class="page active">
+      <h1>Home</h1>
+      <p>Welcome to the Wordle tools site.</p>
+    </div>
+
+    <div id="wordle" class="page">
+      <h1>Wordle (Placeholder)</h1>
+      <p>Normal Wordle game code will go here.</p>
+    </div>
+
+    <div id="temp" class="page">
+      <h1>Temporary Page</h1>
+    </div>
+
+    <div id="guesser" class="page">
+      <h1>Words Guesser</h1>
+
+      <div class="grid-controls">
+        <label>Letters:
+          <select id="colsSelect"></select>
+        </label>
+        <label>Rows:
+          <select id="rowsSelect"></select>
+        </label>
+      </div>
+
+      <div id="board" class="board"></div>
+
+      <div class="answer-box">
+        <input type="text" id="answerInput" placeholder="Insert Wordle answer">
+      </div>
+
+     <button id="findGuessesBtn">Find Guesses</button>
+    </div>
+  </div>
+
+<script src="js/main.js"></script>
+<script src="js/home.js"></script>
+<script src="js/wordle.js"></script>
+<script src="js/guesser.js"></script>
+</body>
+</html>
