@@ -99,7 +99,7 @@ function computeResult(word, answer) {
   return res.join('');
 }
 
-// ======= Find Guesses =======
+// ======= Find Guesses (Reverse Row Algorithm) =======
 findBtn.addEventListener('click', async () => {
   const cols = parseInt(colsSelect.value);
   const rows = parseInt(rowsSelect.value);
@@ -114,29 +114,28 @@ findBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Collect pattern grid
-  let stringResult = "";
+  // Collect grid pattern (colors) row-by-row
+  const resultPatterns = [];
   for (let r = 0; r < rows; r++) {
+    let rowPattern = "";
     for (let c = 0; c < cols; c++) {
       const color = tiles[r][c].dataset.color;
-      stringResult += color === 'gray' ? '0' :
-                      color === 'yellow' ? '1' : '2';
+      if (color === 'gray') rowPattern += '0';
+      else if (color === 'yellow') rowPattern += '1';
+      else rowPattern += '2';
     }
-  }
-  const resultPatterns = [];
-  for (let i = 0; i < stringResult.length; i += cols) {
-    resultPatterns.push(stringResult.slice(i, i + cols));
+    resultPatterns.push(rowPattern);
   }
 
-  // Load word list
+  // Load dictionary JSON
   const filename = `${cols}-letter-words.json`;
-  let availableWords = await loadWordsListJSON(filename);
+  const availableWords = await loadWordsListJSON(filename);
   if (!availableWords.length) {
     alert(`Missing or empty dictionary file: ${filename}`);
     return;
   }
 
-  // Precompute pattern buckets
+  // Precompute pattern -> [words] buckets
   const patternBuckets = {};
   for (const w of availableWords) {
     const p = computeResult(w, answer);
@@ -144,70 +143,78 @@ findBtn.addEventListener('click', async () => {
     patternBuckets[p].push(w);
   }
 
-  // ==== Problem-2 Logic ====
-  let incorrectLetters = new Set();
-  let yellowLetters = []; // [{col, letter}]
-  const rowGuesses = [];
-
-  function randomNonRepeating(words, allowRepeatChance = 0) {
-    const allowRepeat = Math.random() < allowRepeatChance;
-    const pool = allowRepeat ? words : words.filter(w => new Set(w).size === w.length);
-    if (!pool.length) return null;
-    return pool[Math.floor(Math.random() * pool.length)];
-  }
-
-  function violatesConditions(word, cols, pattern) {
-    // Condition 1: contains incorrect letters
-    for (const l of incorrectLetters) if (word.includes(l)) return true;
-    // Condition 2: yellow letters cannot be in same column
-    for (let i = 0; i < cols; i++) {
-      if (pattern[i] === '1') {
-        const letter = word[i];
-        if (yellowLetters.some(y => y.col === i && y.letter === letter))
-          return true;
-      }
+  // Helper: random word from a bucket (optionally non-repeating only)
+  function randomWord(bucket, nonRepeatOnly = false) {
+    if (!bucket || !bucket.length) return null;
+    let candidates = bucket;
+    if (nonRepeatOnly) {
+      candidates = bucket.filter(w => new Set(w).size === w.length);
+      // fallback if none found
+      if (!candidates.length) candidates = bucket;
     }
-    return false;
+    return candidates[Math.floor(Math.random() * candidates.length)];
   }
 
-  for (let r = 0; r < rows; r++) {
+  // State for filtering
+  const incorrectLetters = new Set();     // letters confirmed NOT in answer
+  const yellowLetters = [];               // [{col, letter}] that can't be in same col
+  const rowGuesses = Array(rows).fill('-'.repeat(cols));
+
+  // Skip chance starts at 50% and halves each step up
+  let skipChance = 0.5;
+
+  // Work upwards: last row -> first row
+  for (let r = rows - 1; r >= 0; r--) {
     const pattern = resultPatterns[r];
     const bucket = patternBuckets[pattern] || [];
     if (!bucket.length) {
       rowGuesses[r] = '-'.repeat(cols);
+      skipChance /= 2;
       continue;
     }
 
-    let chosen;
-    if (r === 0) {
-      // First row: 5% chance of repeats
-      chosen = randomNonRepeating(bucket, 0.05);
+    let chosen = null;
+    const allowSkip = Math.random() < skipChance;
+    skipChance /= 2;
+
+    if (allowSkip) {
+      // Skip conditions entirely
+      chosen = randomWord(bucket, true);
     } else {
-      do {
-        // 2.5% chance to skip all filters
-        if (Math.random() < 0.025) {
-          chosen = bucket[Math.floor(Math.random() * bucket.length)];
-          break;
+      // Enforce conditions
+      for (let attempts = 0; attempts < 500 && !chosen; attempts++) {
+        const candidate = randomWord(bucket, true);
+        if (!candidate) break;
+
+        // Condition 1: cannot contain incorrect letters
+        if ([...incorrectLetters].some(ch => candidate.includes(ch))) continue;
+
+        // Condition 2: yellow letters cannot appear in same column
+        let violatesYellow = false;
+        for (const { col, letter } of yellowLetters) {
+          if (candidate[col] === letter) { violatesYellow = true; break; }
         }
-        const pool = bucket.filter(w => new Set(w).size === w.length);
-        if (!pool.length) break;
-        chosen = pool[Math.floor(Math.random() * pool.length)];
-      } while (violatesConditions(chosen, cols, pattern));
+        if (violatesYellow) continue;
+
+        chosen = candidate;
+      }
+      // Fallback if nothing passes conditions
+      if (!chosen) chosen = randomWord(bucket, true);
     }
 
-    if (!chosen) chosen = '-'.repeat(cols);
-    rowGuesses[r] = chosen;
+    // Store the chosen guess
+    rowGuesses[r] = chosen || '-'.repeat(cols);
 
-    // Update knowledge
+    // Update incorrect/yellow sets for next (upper) row
+    const guess = rowGuesses[r];
     for (let c = 0; c < cols; c++) {
-      const color = pattern[c];
-      const letter = chosen[c];
-      if (color === '0') incorrectLetters.add(letter);
-      if (color === '1') yellowLetters.push({ col: c, letter });
+      const color = tiles[r][c].dataset.color;
+      if (color === 'gray') incorrectLetters.add(guess[c]);
+      else if (color === 'yellow') yellowLetters.push({ col: c, letter: guess[c] });
     }
   }
 
-  // Output to tiles
+  // Output guesses to tiles (top-to-bottom)
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       tiles[r][c].textContent = rowGuesses[r][c];
