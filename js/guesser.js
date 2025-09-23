@@ -138,17 +138,22 @@ findBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Precompute word->pattern map
-  const wordResults = {};
+  // Precompute pattern -> [words] map
+  const patternBuckets = {};
   for (const w of availableWords) {
-    wordResults[w] = computeResult(w, answer);
+    const p = computeResult(w, answer);
+    if (!patternBuckets[p]) patternBuckets[p] = [];
+    patternBuckets[p].push(w);
   }
 
-  // Find first matching word for each row pattern
-  const rowGuesses = resultPatterns.map(pattern =>
-    Object.entries(wordResults).find(([w, r]) => r === pattern)?.[0] || '-'.repeat(cols)
-  );
-
+  // Pick random match for each row pattern
+  const rowGuesses = resultPatterns.map(pattern => {
+    const bucket = patternBuckets[pattern] || [];
+    if (!bucket.length) return '-'.repeat(cols);
+    const randomIndex = Math.floor(Math.random() * bucket.length);
+    return bucket[randomIndex];
+  });
+  
   // Output guesses to tiles
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
