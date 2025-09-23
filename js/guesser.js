@@ -12,7 +12,7 @@ for (let c = 3; c <= 8; c++) {
   opt.value = c; opt.textContent = c;
   colsSelect.appendChild(opt);
 }
-for (let r = 6; r <= 12; r++) {
+for (let r = 3; r <= 8; r++) {
   const opt = document.createElement('option');
   opt.value = r; opt.textContent = r;
   rowsSelect.appendChild(opt);
