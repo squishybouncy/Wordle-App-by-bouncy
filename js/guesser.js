@@ -6,7 +6,7 @@ const findBtn = document.getElementById('findGuessesBtn');
 
 let tiles = [];
 
-// Fill dropdowns
+// ======= Dropdowns =======
 for (let c = 3; c <= 8; c++) {
   const opt = document.createElement('option');
   opt.value = c; opt.textContent = c;
@@ -33,7 +33,7 @@ function buildBoard() {
     for (let c = 0; c < cols; c++) {
       const tile = document.createElement('button');
       tile.classList.add('tile');
-      tile.dataset.color = 'gray';     // default gray
+      tile.dataset.color = 'gray';
       tile.dataset.letter = '';
       tile.addEventListener('click', () => cycleColor(tile));
       board.appendChild(tile);
@@ -43,7 +43,6 @@ function buildBoard() {
   }
 }
 buildBoard();
-
 colsSelect.addEventListener('change', buildBoard);
 rowsSelect.addEventListener('change', buildBoard);
 
@@ -52,11 +51,11 @@ function cycleColor(tile) {
   const colors = ['gray', 'yellow', 'green'];
   let next = colors[(colors.indexOf(tile.dataset.color) + 1) % colors.length];
   tile.dataset.color = next;
-  tile.classList.remove('yellow','green');
+  tile.classList.remove('yellow', 'green');
   if (next !== 'gray') tile.classList.add(next);
 }
 
-// ======= Programmatic Letter Input =======
+// ======= Letter Input =======
 function inputLetter(row, col, letter) {
   if (tiles[row] && tiles[row][col]) {
     tiles[row][col].textContent = letter.toUpperCase();
@@ -115,14 +114,13 @@ findBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Collect grid pattern (colors)
+  // Collect pattern grid
   let stringResult = "";
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const color = tiles[r][c].dataset.color;
-      if (color === 'gray') stringResult += '0';
-      else if (color === 'yellow') stringResult += '1';
-      else stringResult += '2';
+      stringResult += color === 'gray' ? '0' :
+                      color === 'yellow' ? '1' : '2';
     }
   }
   const resultPatterns = [];
@@ -130,7 +128,7 @@ findBtn.addEventListener('click', async () => {
     resultPatterns.push(stringResult.slice(i, i + cols));
   }
 
-  // Load matching word list
+  // Load word list
   const filename = `${cols}-letter-words.json`;
   let availableWords = await loadWordsListJSON(filename);
   if (!availableWords.length) {
@@ -138,7 +136,7 @@ findBtn.addEventListener('click', async () => {
     return;
   }
 
-  // Precompute pattern -> [words] map
+  // Precompute pattern buckets
   const patternBuckets = {};
   for (const w of availableWords) {
     const p = computeResult(w, answer);
@@ -146,15 +144,70 @@ findBtn.addEventListener('click', async () => {
     patternBuckets[p].push(w);
   }
 
-  // Pick random match for each row pattern
-  const rowGuesses = resultPatterns.map(pattern => {
+  // ==== Problem-2 Logic ====
+  let incorrectLetters = new Set();
+  let yellowLetters = []; // [{col, letter}]
+  const rowGuesses = [];
+
+  function randomNonRepeating(words, allowRepeatChance = 0) {
+    const allowRepeat = Math.random() < allowRepeatChance;
+    const pool = allowRepeat ? words : words.filter(w => new Set(w).size === w.length);
+    if (!pool.length) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function violatesConditions(word, cols, pattern) {
+    // Condition 1: contains incorrect letters
+    for (const l of incorrectLetters) if (word.includes(l)) return true;
+    // Condition 2: yellow letters cannot be in same column
+    for (let i = 0; i < cols; i++) {
+      if (pattern[i] === '1') {
+        const letter = word[i];
+        if (yellowLetters.some(y => y.col === i && y.letter === letter))
+          return true;
+      }
+    }
+    return false;
+  }
+
+  for (let r = 0; r < rows; r++) {
+    const pattern = resultPatterns[r];
     const bucket = patternBuckets[pattern] || [];
-    if (!bucket.length) return '-'.repeat(cols);
-    const randomIndex = Math.floor(Math.random() * bucket.length);
-    return bucket[randomIndex];
-  });
-  
-  // Output guesses to tiles
+    if (!bucket.length) {
+      rowGuesses[r] = '-'.repeat(cols);
+      continue;
+    }
+
+    let chosen;
+    if (r === 0) {
+      // First row: 5% chance of repeats
+      chosen = randomNonRepeating(bucket, 0.05);
+    } else {
+      do {
+        // 2.5% chance to skip all filters
+        if (Math.random() < 0.025) {
+          chosen = bucket[Math.floor(Math.random() * bucket.length)];
+          break;
+        }
+        const pool = bucket.filter(w => new Set(w).size === w.length);
+        if (!pool.length) break;
+        chosen = pool[Math.floor(Math.random() * pool.length)];
+      } while (violatesConditions(chosen, cols, pattern));
+    }
+
+    if (!chosen) chosen = '-'.repeat(cols);
+    rowGuesses[r] = chosen;
+
+    // Update knowledge
+    for (let c = 0; c < cols; c++) {
+      const color = pattern[c];
+      const letter = chosen[c];
+      if (color === '0') incorrectLetters.add(letter);
+      if (color === '1') yellowLetters.push({ col: c, letter });
+    }
+  }
+
+  // Output to tiles
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       tiles[r][c].textContent = rowGuesses[r][c];
