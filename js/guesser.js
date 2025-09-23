@@ -66,15 +66,17 @@ function inputLetter(row, col, letter) {
 
 // ======= Load Word List =======
 async function loadWordsListJSON(filename) {
-  const response = await fetch(`dictionaries/${filename}`);
-  if (!response.ok) throw new Error("Failed to load word list");
-  const text = await response.text();
-  const words = [];
-  text.split(/\r?\n/).forEach(line => {
-    const w = line.trim().toUpperCase();
-    if (w.length && /^[A-Z]+$/.test(w)) words.push(w);
-  });
-  return words;
+  try {
+    const response = await fetch(`dictionaries/${filename}`);
+    if (!response.ok) throw new Error("Failed to load word list");
+    const data = await response.json();
+    return data
+      .filter(w => typeof w === 'string' && /^[A-Z]+$/i.test(w))
+      .map(w => w.toUpperCase());
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
 }
 
 // ======= Compute Wordle Result =======
