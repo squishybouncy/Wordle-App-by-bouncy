@@ -15,7 +15,7 @@ body {
 }
 
 .menu-left {
-  display: flex;          /* horizontal layout */
+  display: flex;
   align-items: center;
   gap: 10px;
 }
@@ -77,44 +77,4 @@ body {
 }
 .page.active {
   display: block;
-}
-
-/* ===== BOARD / GRID ===== */
-.board {
-  display: grid;
-  gap: 5px;
-  justify-content: center;
-  margin: 20px auto;
-}
-
-.tile {
-  width: 50px;
-  height: 50px;
-  border: 2px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 24px;
-  font-weight: bold;
-  background: #787c7e; /* default gray */
-  color: white;
-  cursor: pointer;
-  user-select: none;
-  text-transform: uppercase;
-}
-
-.yellow { background: #c9b458; }
-.green  { background: #6aaa64; }
-
-/* ===== CONTROLS ===== */
-.grid-controls {
-  margin: 15px 0;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.answer-box {
-  margin: 15px 0;
 }

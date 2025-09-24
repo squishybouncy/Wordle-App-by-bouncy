@@ -1,0 +1,17 @@
+.tile { width:60px; height:60px; display:inline-flex;
+        align-items:center; justify-content:center;
+        margin:2px; font-size:2rem; font-weight:bold;
+        border:2px solid #ccc; background:white; }
+
+.tile.green       { background:#6aaa64; color:white; }
+.tile.red         { background:#d33; color:white; }
+.tile.light-red   { background:#f88; color:white; }
+.tile.gray        { background:#888; color:white; }
+.tile.light-blue  { background:#9cf; color:white; }
+.tile.blue        { background:#36f; color:white; }
+
+.keyboard-row { display:flex; justify-content:center; margin:4px 0; }
+.key { padding:12px 8px; margin:2px; border:1px solid #888;
+       border-radius:4px; background:#eee; cursor:pointer;
+       font-weight:bold; }
+.key.wide { flex:1; }
