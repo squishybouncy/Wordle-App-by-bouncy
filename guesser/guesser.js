@@ -66,7 +66,7 @@ function inputLetter(row, col, letter) {
 // ======= Load Word List =======
 async function loadWordsListJSON(filename) {
   try {
-    const response = await fetch(`dictionaries/${filename}`);
+    const response = await fetch(`../dictionaries/${filename}`);
     if (!response.ok) throw new Error("Failed to load word list");
     const data = await response.json();
     return data

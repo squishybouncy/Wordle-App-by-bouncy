@@ -38,7 +38,7 @@ function randomWord(){
 
 // Load dictionary for current length
 async function loadDict(){
-  const file = `dictionaries/${wordLen}-letter-words.json`;
+  const file = `../dictionaries/${wordLen}-letter-words.json`;
   const res = await fetch(file);
   dictionary = await res.json();
 }
