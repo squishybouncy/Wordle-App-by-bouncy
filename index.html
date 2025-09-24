@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wordle App by bouncy</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wordle App by bouncy</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- ===== MENU ===== -->
-  <nav class="menu">
+  <!-- ===== NAV ===== -->
+  <nav class="menu" role="navigation" aria-label="Main">
     <div class="menu-left">
-      <button class="menu-btn" data-page="home">Home</button>
+      <a class="menu-btn" href="index.html">Home</a>
+
       <div class="menu-dropdown">
-        <button class="menu-btn">Plays ▾</button>
-        <div class="dropdown-content">
-          <button data-page="Warmle">Warmle</button>
+        <button class="menu-btn" aria-haspopup="true" aria-expanded="false">Plays ▾</button>
+        <div class="dropdown-content" role="menu">
+          <a role="menuitem" class="dropdown-link" href="warmle/warmle.html">Warmle</a>
         </div>
       </div>
+
       <div class="menu-dropdown">
-        <button class="menu-btn">Tools ▾</button>
-        <div class="dropdown-content">
-          <button data-page="guesser">Words Guesser from Result</button>
+        <button class="menu-btn" aria-haspopup="true" aria-expanded="false">Tools ▾</button>
+        <div class="dropdown-content" role="menu">
+          <a role="menuitem" class="dropdown-link" href="guesser/guesser.html">Words Guesser</a>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- ===== PAGES ===== -->
-  <div id="pages">
-    <div id="home" class="page active">
+  <!-- ===== PAGES (Home) ===== -->
+  <main id="pages">
+    <section id="home" class="page active">
       <h1>Home</h1>
-      <p>Hi, use Plays or Tools menu to nagivate.</p>
-    </div>
-  </div>
+      <p>Hi — use the Plays or Tools menu to navigate to Warmle or the Words Guesser.</p>
+    </section>
+  </main>
 
-<script src="main.js"></script>
+  <script src="main.js" defer></script>
 </body>
 </html>

@@ -1,29 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Warmle</title>
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="warmle.css">
+
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="warmle.css" />
 </head>
 <body>
-  <header>
-    <h1>Warmle</h1>
-  </header>
+  <nav class="menu" role="navigation" aria-label="Main">
+    <div class="menu-left">
+      <a class="menu-btn" href="../index.html">Home</a>
 
-  <section id="controls">
-    <label>Letters:
-      <select id="lenSelect"></select>
-    </label>
-    <button id="retryBtn">Retry</button>
-  </section>
+      <div class="menu-dropdown">
+        <button class="menu-btn">Plays ▾</button>
+        <div class="dropdown-content">
+          <a href="warmle.html">Warmle</a>
+        </div>
+      </div>
 
-  <section id="board"></section>
+      <div class="menu-dropdown">
+        <button class="menu-btn">Tools ▾</button>
+        <div class="dropdown-content">
+          <a href="../guesser/guesser.html">Words Guesser</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-  <section id="keyboard"></section>
+  <main>
+    <header>
+      <h1>Warmle</h1>
+    </header>
 
-  <p id="result"></p>
+    <section id="controls">
+      <label>Letters:
+        <select id="lenSelect"></select>
+      </label>
+      <button id="retryBtn">Retry</button>
+    </section>
 
-  <script src="warmle.js"></script>
+    <section id="board"></section>
+
+    <section id="keyboard"></section>
+
+    <p id="result"></p>
+  </main>
+
+  <script src="warmle.js" defer></script>
 </body>
 </html>

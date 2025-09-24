@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Words Guesser</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Words Guesser</title>
 
-<!-- Load global CSS from root -->
-<link rel="stylesheet" href="../style.css">
-<!-- Page-specific CSS (optional) -->
-<link rel="stylesheet" href="guesser.css">
+  <!-- Global styles (root) -->
+  <link rel="stylesheet" href="../style.css" />
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="guesser.css" />
 </head>
 <body>
-
-  <!-- Menu (link back to Home/other pages) -->
-  <nav class="menu">
+  <!-- ===== NAV (subpage) ===== -->
+  <nav class="menu" role="navigation" aria-label="Main">
     <div class="menu-left">
       <a class="menu-btn" href="../index.html">Home</a>
+
       <div class="menu-dropdown">
         <button class="menu-btn">Plays ▾</button>
         <div class="dropdown-content">
           <a href="../warmle/warmle.html">Warmle</a>
         </div>
       </div>
+
       <div class="menu-dropdown">
         <button class="menu-btn">Tools ▾</button>
         <div class="dropdown-content">
@@ -46,12 +47,13 @@
     <div id="board" class="board"></div>
 
     <div class="answer-box">
-      <input type="text" id="answerInput" placeholder="Insert Wordle answer">
+      <input type="text" id="answerInput" placeholder="Insert Wordle answer" />
     </div>
 
     <button id="findGuessesBtn">Find Guesses</button>
   </main>
 
-  <script src="guesser.js"></script>
+  <!-- Page script (runs after DOM) -->
+  <script src="guesser.js" defer></script>
 </body>
 </html>
