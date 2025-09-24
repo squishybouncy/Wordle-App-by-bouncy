@@ -1,159 +1,159 @@
-const boardEl    = document.getElementById('board');
-const lenSelect  = document.getElementById('lenSelect');
-const retryBtn   = document.getElementById('retryBtn');
-const resultEl   = document.getElementById('result');
-const keyboardEl = document.getElementById('keyboard');
+/* ========================
+   Warmle – rewritten JS
+   ======================== */
+const board   = document.getElementById('board');
+const keyboard= document.getElementById('keyboard');
+const lenSel  = document.getElementById('lenSelect');
+const retryBtn= document.getElementById('retryBtn');
+const result  = document.getElementById('result');
 
-let answer = '';
-let wordLen = 5;
-let currentRow = [];
-let rows = [];
-let maxRows = 6;
-let dictionary = [];
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+let wordLength = 5;
+let answer     = '';
+let currentRow = 0;
+let currentCol = 0;
+let rows       = [];
+let dict       = [];        // loaded from JSON
 
-// Populate length selector (reuse from guesser idea)
-for (let i=3;i<=8;i++){
-  const opt=document.createElement('option');
-  opt.value=i; opt.textContent=i;
-  if(i===5) opt.selected=true;
-  lenSelect.appendChild(opt);
-}
+/* ---------- helpers ---------- */
+function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function alphaDist(a,b){ return Math.abs(a.charCodeAt(0)-b.charCodeAt(0)); }
 
-// Utilities
-function alphabetDistance(a,b){
-  return Math.abs(a.charCodeAt(0)-b.charCodeAt(0));
-}
-function colorForDistance(d){
-  if(d===0) return 'green';
-  if(d===1) return 'red';
-  if(d<=3)  return 'light-red';
-  if(d<=6)  return 'gray';
-  if(d<=10) return 'light-blue';
+function colorFor(letter, idx){
+  const correct = answer[idx];
+  if(letter === correct) return 'green';
+  const dist = Math.min(...[...answer].map(ch => alphaDist(letter,ch)));
+  if(dist<=1) return 'red';
+  if(dist<=3) return 'light-red';
+  if(dist<=6) return 'gray';
+  if(dist<=10) return 'light-blue';
   return 'blue';
 }
-function randomWord(){
-  const list = dictionary.filter(w=>w.length===wordLen);
-  return list[Math.floor(Math.random()*list.length)].toUpperCase();
-}
 
-// Load dictionary for current length
-async function loadDict(){
-  const file = `../dictionaries/${wordLen}-letter-words.json`;
-  const res = await fetch(file);
-  dictionary = await res.json();
-}
-
-// Draw board
-function drawBoard(){
-  boardEl.innerHTML='';
+/* ---------- board setup ---------- */
+function buildBoard(){
+  board.innerHTML='';
   rows=[];
-  for(let r=0;r<maxRows;r++){
+  for(let r=0;r<6;r++){
     const row=[];
-    const rowEl=document.createElement('div');
-    for(let c=0;c<wordLen;c++){
+    const div=document.createElement('div');
+    div.className='board-row';
+    for(let c=0;c<wordLength;c++){
       const t=document.createElement('div');
       t.className='tile';
+      div.appendChild(t);
       row.push(t);
-      rowEl.appendChild(t);
     }
+    board.appendChild(div);
     rows.push(row);
-    boardEl.appendChild(rowEl);
   }
+  currentRow=0;
+  currentCol=0;
 }
 
-// Draw keyboard
-function drawKeyboard(){
+function buildKeyboard(){
+  keyboard.innerHTML='';
   const layout=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
-  keyboardEl.innerHTML='';
-  layout.forEach((rowLetters,ri)=>{
-    const rowEl=document.createElement('div');
-    rowEl.className='keyboard-row';
-    if(ri===2){
-      const enter=document.createElement('div');
-      enter.textContent='Enter';
-      enter.className='key wide';
-      enter.onclick=handleEnter;
-      rowEl.appendChild(enter);
-    }
-    for(const ch of rowLetters){
-      const key=document.createElement('div');
-      key.textContent=ch;
-      key.className='key';
-      key.onclick=()=>handleKey(ch);
-      rowEl.appendChild(key);
-    }
-    if(ri===2){
-      const back=document.createElement('div');
-      back.textContent='⌫';
-      back.className='key wide';
-      back.onclick=handleBack;
-      rowEl.appendChild(back);
-    }
-    keyboardEl.appendChild(rowEl);
+  layout.forEach(line=>{
+    const row=document.createElement('div');
+    row.className='keyboard-row';
+    line.split('').forEach(ch=>{
+      const k=document.createElement('button');
+      k.className='key';
+      k.textContent=ch;
+      k.addEventListener('click',()=>pressLetter(ch));
+      row.appendChild(k);
+    });
+    keyboard.appendChild(row);
   });
+  const bottom=document.createElement('div');
+  bottom.className='keyboard-row';
+  const enter=document.createElement('button');
+  enter.className='key enter';
+  enter.textContent='Enter';
+  enter.addEventListener('click',submitWord);
+  const del=document.createElement('button');
+  del.className='key delete';
+  del.textContent='⌫';
+  del.addEventListener('click',deleteLetter);
+  bottom.appendChild(enter);
+  bottom.appendChild(del);
+  keyboard.appendChild(bottom);
 }
 
-// Game reset
-async function reset(){
-  wordLen = parseInt(lenSelect.value);
-  await loadDict();
-  answer = randomWord();
-  currentRow=[];
-  resultEl.textContent='';
-  drawBoard();
+/* ---------- input handling ---------- */
+function pressLetter(ch){
+  if(currentCol < wordLength && currentRow < 6){
+    rows[currentRow][currentCol].textContent = ch;
+    currentCol++;
+  }
 }
-lenSelect.onchange = reset;
-retryBtn.onclick   = reset;
+function deleteLetter(){
+  if(currentCol>0){
+    currentCol--;
+    rows[currentRow][currentCol].textContent='';
+  }
+}
 
-// Input handlers
-function handleKey(ch){
-  if(currentRow.length<wordLen){
-    currentRow.push(ch);
-    updateTiles();
-  }
-}
-function handleBack(){
-  currentRow.pop();
-  updateTiles();
-}
-function updateTiles(){
-  const row = rows.find(r => r.some(t => t.textContent==='')) || rows[rows.length-1];
-  if(!row) return;
-  for(let i=0;i<wordLen;i++){
-    row[i].textContent=currentRow[i]||'';
-  }
-}
-function handleEnter(){
-  if(currentRow.length!==wordLen) return;
-  const guess=currentRow.join('');
-  if(!dictionary.includes(guess.toLowerCase())){
-    alert('Not in word list');
+function submitWord(){
+  if(currentCol !== wordLength) return; // must fill row
+  const guess = rows[currentRow].map(t=>t.textContent).join('');
+  if(!dict.includes(guess.toLowerCase())){
+    showMessage('Not in word list');
     return;
   }
-  // Score colors
-  const row=rows.find(r => r.some(t => t.textContent!==''));
-  row.forEach((tile,i)=>{
-    const d = alphabetDistance(guess[i], answer[i]);
-    tile.className='tile '+colorForDistance(d);
-  });
+  // color current row only
+  for(let i=0;i<wordLength;i++){
+    rows[currentRow][i].classList.add(colorFor(guess[i],i));
+  }
   if(guess===answer){
-    resultEl.textContent=`Solved in ${rows.indexOf(row)+1} attempts!`;
+    showMessage(`Solved in ${currentRow+1} attempt${currentRow? 's':''}!`);
     return;
   }
-  if(rows.indexOf(row)===maxRows-1){
-    resultEl.textContent=`Out of attempts! Answer: ${answer}`;
-    return;
-  }
-  currentRow=[];
+  currentRow++;
+  currentCol=0;
+  if(currentRow===6) showMessage(`Answer: ${answer}`);
 }
 
-// Keyboard input support
-window.addEventListener('keydown',e=>{
-  if(/^[a-z]$/i.test(e.key)) handleKey(e.key.toUpperCase());
-  else if(e.key==='Backspace') handleBack();
-  else if(e.key==='Enter') handleEnter();
+function showMessage(msg){
+  result.textContent = msg;
+}
+
+/* ---------- game setup ---------- */
+function newGame(){
+  fetch(`../dictionaries/${wordLength}-letter-words.json`)
+    .then(r=>r.json())
+    .then(data=>{
+      dict = data;
+      answer = randChoice(dict).toUpperCase();
+      buildBoard();
+      showMessage('');
+    });
+}
+
+lenSel.addEventListener('change',()=>{
+  wordLength = parseInt(lenSel.value,10);
+  newGame();
+});
+retryBtn.addEventListener('click',newGame);
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter') submitWord();
+  else if(e.key==='Backspace') deleteLetter();
+  else{
+    const ch=e.key.toUpperCase();
+    if(LETTERS.includes(ch)) pressLetter(ch);
+  }
 });
 
-// Init
-reset();
-drawKeyboard();
+/* ---------- init ---------- */
+(function init(){
+  for(let n=3;n<=8;n++){
+    const o=document.createElement('option');
+    o.value=n; o.textContent=n;
+    if(n===wordLength) o.selected=true;
+    lenSel.appendChild(o);
+  }
+  buildKeyboard();
+  newGame();
+})();

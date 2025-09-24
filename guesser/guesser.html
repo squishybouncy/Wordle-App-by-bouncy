@@ -5,32 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Words Guesser</title>
 
-  <!-- Global styles (root) -->
   <link rel="stylesheet" href="../style.css" />
-  <!-- Page-specific styles -->
   <link rel="stylesheet" href="guesser.css" />
 </head>
 <body>
-  <!-- ===== NAV (subpage) ===== -->
-  <nav class="menu" role="navigation" aria-label="Main">
-    <div class="menu-left">
-      <a class="menu-btn" href="../index.html">Home</a>
-
-      <div class="menu-dropdown">
-        <button class="menu-btn">Plays ▾</button>
-        <div class="dropdown-content">
-          <a href="../warmle/warmle.html">Warmle</a>
-        </div>
-      </div>
-
-      <div class="menu-dropdown">
-        <button class="menu-btn">Tools ▾</button>
-        <div class="dropdown-content">
-          <a href="guesser.html">Words Guesser</a>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <nav class="menu"></nav>   <!-- same single line -->
 
   <main>
     <h1>Words Guesser from Result</h1>
@@ -53,7 +32,7 @@
     <button id="findGuessesBtn">Find Guesses</button>
   </main>
 
-  <!-- Page script (runs after DOM) -->
+  <script src="../menu.js" defer></script>
   <script src="guesser.js" defer></script>
 </body>
 </html>

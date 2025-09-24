@@ -7,28 +7,8 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- ===== NAV ===== -->
-  <nav class="menu" role="navigation" aria-label="Main">
-    <div class="menu-left">
-      <a class="menu-btn" href="index.html">Home</a>
+  <nav class="menu"></nav>   <!-- menu injected by menu.js -->
 
-      <div class="menu-dropdown">
-        <button class="menu-btn" aria-haspopup="true" aria-expanded="false">Plays ▾</button>
-        <div class="dropdown-content" role="menu">
-          <a role="menuitem" class="dropdown-link" href="warmle/warmle.html">Warmle</a>
-        </div>
-      </div>
-
-      <div class="menu-dropdown">
-        <button class="menu-btn" aria-haspopup="true" aria-expanded="false">Tools ▾</button>
-        <div class="dropdown-content" role="menu">
-          <a role="menuitem" class="dropdown-link" href="guesser/guesser.html">Words Guesser</a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ===== PAGES (Home) ===== -->
   <main id="pages">
     <section id="home" class="page active">
       <h1>Home</h1>
@@ -36,6 +16,7 @@
     </section>
   </main>
 
+  <script src="menu.js" defer></script>
   <script src="main.js" defer></script>
 </body>
 </html>

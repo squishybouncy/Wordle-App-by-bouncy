@@ -1,7 +1,14 @@
-.tile { width:60px; height:60px; display:inline-flex;
-        align-items:center; justify-content:center;
-        margin:2px; font-size:2rem; font-weight:bold;
-        border:2px solid #ccc; background:white; }
+.tile {
+  width: 60px;
+  height: 60px;
+  line-height: 60px;      /* keep text vertically centered */
+  border: 2px solid #ccc; /* same border thickness for empty/filled */
+  display: inline-flex;   /* stable alignment */
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  box-sizing: border-box; /* include border in width/height */
+}
 
 .tile.green       { background:#6aaa64; color:white; }
 .tile.red         { background:#d33; color:white; }
@@ -10,8 +17,13 @@
 .tile.light-blue  { background:#9cf; color:white; }
 .tile.blue        { background:#36f; color:white; }
 
-.keyboard-row { display:flex; justify-content:center; margin:4px 0; }
-.key { padding:12px 8px; margin:2px; border:1px solid #888;
-       border-radius:4px; background:#eee; cursor:pointer;
-       font-weight:bold; }
-.key.wide { flex:1; }
+.key {
+  flex: 1 0 40px; /* same base width for all */
+  max-width: 60px;
+  padding: 8px;
+}
+
+.key.enter,
+.key.delete {
+  flex: 1 0 40px; /* REMOVE larger flex (no 2x sizing) */
+}
